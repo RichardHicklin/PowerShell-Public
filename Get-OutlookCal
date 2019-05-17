@@ -1,0 +1,36 @@
+Function Get-OutlookCal
+{ 
+  <# 
+   .Synopsis 
+    This function returns appointment items from default Outlook profile
+
+   .Description 
+    This function returns appointment items from default Outlook profile. It 
+    uses the Outlook interop assembly to use the olFolderCalendar enumeration. 
+    It creates a custom object consisting of Subject, Start, Duration, Location 
+    for each appointment item.
+
+   .Example 
+    Get-OutlookCalendar | where-object { $_.start -gt [datetime]"5/10/2011" -AND $_.start -lt [datetime]"5/17/2011" } | sort-object Duration 
+    
+    Displays subject, start, duration and location for all appointments that occur between 5/10/11 and 5/17/11 and sorts by duration of the appointment.The sort is shortest appointment on top.
+     
+   .Notes 
+    NAME:  Get-OutlookCalendar 
+    AUTHOR: Richard Hicklin 
+    LASTEDIT: 05/14/19
+    KEYWORDS: Microsoft Outlook, Office 
+
+   .Link 
+     Http://github/Richard.Hicklin
+
+ #Requires -Version 2.0
+
+ #> 
+ Add-type -assembly "Microsoft.Office.Interop.Outlook" | out-null 
+ $olFolders = "Microsoft.Office.Interop.Outlook.OlDefaultFolders" -as [type]  
+ $outlook = new-object -comobject outlook.application 
+ $namespace = $outlook.GetNameSpace("MAPI") 
+ $folder = $namespace.getDefaultFolder($olFolders::olFolderCalendar) 
+ $Testing = $folder.items | Select-Object -Property Subject, Start, Duration
+} #end function Get-OutlookCalendar
